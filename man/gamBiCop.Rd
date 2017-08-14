@@ -23,9 +23,9 @@ gamBiCop(family, model, par2 = 0, tau = TRUE)
 \code{\link{gam}} function 
 from the \code{\link[mgcv:mgcv-package]{mgcv}} package.}
 
-\item{par2}{Second parameter for the Studen t-copula.}
+\item{par2}{Second parameter for the Student t-copula.}
 
-\item{tau}{\code{FALSE} for a calibration fonction specified 
+\item{tau}{\code{FALSE} for a calibration function specified 
 for the Copula parameter or \code{TRUE} (default) for a calibration 
 function specified for Kendall's tau.}
 }
@@ -42,4 +42,3 @@ Constructs an object of the class
 \code{\link{gamBiCopFit}}, \code{\link{gamBiCopPredict}} and 
 \code{\link{gamBiCopSimulate}}.
 }
-

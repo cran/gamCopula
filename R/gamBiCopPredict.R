@@ -6,7 +6,7 @@
 #' \code{\link[mgcv:mgcv-package]{mgcv}} package) A matrix or data frame 
 #' containing the values of the model covariates at which predictions are 
 #' required. If this is not provided then predictions corresponding to the 
-#' original data are returned. If newdata is provided then it should contain all 
+#' original data are returned. If \code{newdata} is provided then it should contain all 
 #' the variables needed for prediction: a warning is generated if not.
 #' @param target Either \code{'calib'}, \code{'par'} or \code{'tau'} or a 
 #' combination of those. \code{'calib'} (default) corresponds to the calibration 
@@ -17,11 +17,11 @@
 #' \code{\link[mgcv:mgcv-package]{mgcv}} package, only active for 
 #' \code{type = 'calib'}). When this has the value \code{'link'} (default), the 
 #' calibration function is returned.  When \code{type = 'terms'} each component 
-#' of the linear predictor is returned seperately (possibly with standard 
+#' of the linear predictor is returned separately (possibly with standard 
 #' errors): this includes parametric model components, followed by each smooth 
 #' component, but excludes any offset and any intercept. When 
 #' \code{type = 'lpmatrix'} then a matrix is returned which yields the values of
-#' the linear predictor (minus any offset) when postmultiplied by the parameter 
+#' the linear predictor (minus any offset) when post-multiplied by the parameter 
 #' vector (in this case alpha is ignored).
 #' @return If \code{target = 'calib'}, then a list with 1 item \code{calib}. 
 #' If \code{target = 'par'}, \code{target = 'tau'} or 
@@ -33,9 +33,9 @@
 #' \code{calib.CI} as well as e.g. \code{par.CI} and/or \code{tau.CI} depending 
 #' on the value of \code{target}.
 #'  
-#' Otherwhise, if \code{type = 'lpmatrix'} (only active for 
+#' Otherwise, if \code{type = 'lpmatrix'} (only active for 
 #' \code{type = 'calib'}), then a matrix is returned which will give a vector of
-#' linear predictor values (minus any offest) at the supplied covariate values, 
+#' linear predictor values (minus any offset) at the supplied covariate values, 
 #' when applied to the model coefficient vector (similar as 
 #' \code{\link{predict.gam}} from the \code{\link[mgcv:mgcv-package]{mgcv}}). 
 #' @seealso \code{\link{gamBiCop}} and \code{\link{gamBiCopFit}}.
@@ -161,7 +161,11 @@ gamBiCopPredict <- function(object, newdata = NULL,
   quantile.fun <- function(x) quantile(x, c((1 - alpha)/2, 1 - (1 - alpha)/2))
   myCI <- function(x) t(apply(x, 2, quantile.fun))
   if (!sel && (alpha != 0) && (alpha != 1)) {
-    Xp <- predict.gam(mm, as.data.frame(newdata), type = "lpmatrix")
+    if (is.null(newdata)) {
+      Xp <- predict.gam(mm, type = "lpmatrix")
+    } else {
+      Xp <- predict.gam(mm, as.data.frame(newdata), type = "lpmatrix")
+    }
     b <- coef(mm)
     Vp <- vcov(mm)
     br <- mvrnorm(1e4, b, Vp)

@@ -2,9 +2,9 @@
 % Please edit documentation in R/gamVine.R
 \docType{methods}
 \name{summary.gamVine}
-\alias{summary,gamVine-method}
 \alias{summary.gamVine}
-\title{Summary for an Object of the Class gamVin}
+\alias{summary,gamVine-method}
+\title{Summary for an Object of the Class gamVine}
 \usage{
 \S4method{summary}{gamVine}(object)
 }
@@ -12,7 +12,7 @@
 \item{object}{An object of the class
 \code{\link[gamCopula:gamVine-class]{gamVine}}.}
 
-\item{...}{un-used in this class}
+\item{...}{unused in this class}
 }
 \value{
 A useful summary (see \code{\link{summary.gam}}
@@ -27,4 +27,3 @@ useful summaries from it.
 \code{\link{summary.gam}}
 from \code{\link[mgcv:mgcv-package]{mgcv}}
 }
-

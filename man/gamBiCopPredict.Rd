@@ -15,7 +15,7 @@ gamBiCopPredict(object, newdata = NULL, target = "calib", alpha = 0,
 \code{\link[mgcv:mgcv-package]{mgcv}} package) A matrix or data frame 
 containing the values of the model covariates at which predictions are 
 required. If this is not provided then predictions corresponding to the 
-original data are returned. If newdata is provided then it should contain all 
+original data are returned. If \code{newdata} is provided then it should contain all 
 the variables needed for prediction: a warning is generated if not.}
 
 \item{target}{Either \code{'calib'}, \code{'par'} or \code{'tau'} or a 
@@ -29,11 +29,11 @@ function, \code{'par'} to the copula parameter and
 \code{\link[mgcv:mgcv-package]{mgcv}} package, only active for 
 \code{type = 'calib'}). When this has the value \code{'link'} (default), the 
 calibration function is returned.  When \code{type = 'terms'} each component 
-of the linear predictor is returned seperately (possibly with standard 
+of the linear predictor is returned separately (possibly with standard 
 errors): this includes parametric model components, followed by each smooth 
 component, but excludes any offset and any intercept. When 
 \code{type = 'lpmatrix'} then a matrix is returned which yields the values of
-the linear predictor (minus any offset) when postmultiplied by the parameter 
+the linear predictor (minus any offset) when post-multiplied by the parameter 
 vector (in this case alpha is ignored).}
 }
 \value{
@@ -47,9 +47,9 @@ If \code{alpha} is in (0,1), then a additional items of the list are
 \code{calib.CI} as well as e.g. \code{par.CI} and/or \code{tau.CI} depending 
 on the value of \code{target}.
  
-Otherwhise, if \code{type = 'lpmatrix'} (only active for 
+Otherwise, if \code{type = 'lpmatrix'} (only active for 
 \code{type = 'calib'}), then a matrix is returned which will give a vector of
-linear predictor values (minus any offest) at the supplied covariate values, 
+linear predictor values (minus any offset) at the supplied covariate values, 
 when applied to the model coefficient vector (similar as 
 \code{\link{predict.gam}} from the \code{\link[mgcv:mgcv-package]{mgcv}}).
 }
@@ -115,4 +115,3 @@ pred <- gamBiCopPredict(fit$res, X, target = c("calib", "par", "tau"))
 \seealso{
 \code{\link{gamBiCop}} and \code{\link{gamBiCopFit}}.
 }
-

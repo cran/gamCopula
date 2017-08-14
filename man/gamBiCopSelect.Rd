@@ -8,7 +8,7 @@ Additive model (gam) for the copula parameter or Kendall's tau.}
 gamBiCopSelect(udata, lin.covs = NULL, smooth.covs = NULL, familyset = NA,
   rotations = TRUE, familycrit = "AIC", level = 0.05, edf = 1.5,
   tau = TRUE, method = "FS", tol.rel = 0.001, n.iters = 10,
-  parallel = FALSE, verbose = FALSE, ...)
+  parallel = FALSE, verbose = FALSE, select.once = TRUE, ...)
 }
 \arguments{
 \item{udata}{A matrix or data frame containing the model responses, (u1,u2) in 
@@ -53,7 +53,7 @@ predictors (default: \code{level = 0.05}).}
 smaller than \code{edf} but the predictor is still significant, then
 it is set as linear (default: \code{edf = 1.5}).}
 
-\item{tau}{\code{FALSE} for a calibration fonction specified for 
+\item{tau}{\code{FALSE} for a calibration function specified for 
 the Copula parameter or \code{TRUE} (default) for a calibration function 
 specified for Kendall's tau.}
 
@@ -65,10 +65,12 @@ specified for Kendall's tau.}
 \item{n.iters}{Maximal number of iterations for 
 \code{'FS'}/\code{'NR'} algorithm.}
 
-\item{parallel}{\code{TRUE} for a parallel estimation across copula families.
-As the code is based on mclapply, this parameter has no effect on windows.}
+\item{parallel}{\code{TRUE} for a parallel estimation across copula families.}
 
 \item{verbose}{\code{TRUE} prints informations during the estimation.}
+
+\item{select.once}{if \code{TRUE} the GAM structure is only selected once,
+for the family that appears first in \code{familyset}.}
 
 \item{...}{Additional parameters to be passed to \code{\link{gam}}}
 }
@@ -143,4 +145,3 @@ plot(best$res)}
 \seealso{
 \code{\link{gamBiCop}} and \code{\link{gamBiCopFit}}.
 }
-

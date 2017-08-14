@@ -9,7 +9,7 @@ gamVineCopSelect(data, Matrix, lin.covs = NULL, smooth.covs = NULL,
   simplified = FALSE, familyset = NA, rotations = TRUE,
   familycrit = "AIC", level = 0.05, trunclevel = NA, tau = TRUE,
   method = "FS", tol.rel = 0.001, n.iters = 10, parallel = FALSE,
-  verbose = FALSE)
+  verbose = FALSE, select.once = TRUE)
 }
 \arguments{
 \item{data}{A matrix or data frame containing the data in [0,1]^d.}
@@ -23,9 +23,9 @@ linear) covariates (default: \code{lin.covs = NULL}).}
 \item{smooth.covs}{A matrix or data frame containing the non-parametric 
 (i.e., smooth) covariates (default: \code{smooth.covs = NULL}).}
 
-\item{simplified}{If \code{TRUE}, then a simplified PCC is fitted (which is
+\item{simplified}{If \code{TRUE}, then a simplified vine is fitted (which is
 possible only if there are exogenous covariates). If \code{FALSE} (default),
-then a non-simplified PCC is fitted.}
+then a non-simplified vine is fitted.}
 
 \item{familyset}{An integer vector of pair-copula families to select from 
 (the independence copula MUST NOT be specified in this vector unless one 
@@ -55,7 +55,7 @@ predictors (default: \code{level = 0.05}) for each conditional pair-copula.}
 
 \item{trunclevel}{Integer; level of truncation.}
 
-\item{tau}{\code{TRUE} (default) for a calibration fonction specified for 
+\item{tau}{\code{TRUE} (default) for a calibration function specified for 
 Kendall's tau or \code{FALSE} for a calibration function specified 
 for the Copula parameter.}
 
@@ -74,6 +74,9 @@ for the Copula parameter.}
 \item{verbose}{\code{TRUE} if informations should be printed during the 
 estimation and \code{FALSE} (default) for a silent version.
 from \code{\link[mgcv:mgcv-package]{mgcv}}.}
+
+\item{select.once}{if \code{TRUE} the GAM structure is only selected once,
+for the family that appears first in \code{familyset}.}
 }
 \value{
 \code{gamVineCopSelect} returns a \code{\link{gamVine-class}} object.
@@ -231,4 +234,3 @@ plot(fitGVC2, ylim = c(-2.5,2.5))}
  \code{\link{gamVine-class}}, \code{\link{gamVineSimulate}} and 
  \code{\link{gamBiCopFit}}.
 }
-

@@ -14,9 +14,9 @@
 #' linear) covariates (default: \code{lin.covs = NULL}).
 #' @param smooth.covs A matrix or data frame containing the non-parametric 
 #' (i.e., smooth) covariates (default: \code{smooth.covs = NULL}).
-#' @param simplified If \code{TRUE} (default), then a simplified PCC is fitted 
+#' @param simplified If \code{TRUE} (default), then a simplified vine is fitted 
 #' (which is possible only if there are exogenous covariates). If \code{FALSE}, 
-#' then a non-simplified PCC is fitted.
+#' then a non-simplified vine is fitted.
 #' @param type \code{type = 0} (default) for a R-Vine and \code{type = 1} for a
 #' C-Vine.
 #' @param familyset An integer vector of pair-copula families to select from 
@@ -43,14 +43,14 @@
 #' \code{'BIC'}, as in \code{\link{BiCopSelect}} from the 
 #' \code{\link[VineCopula:VineCopula-package]{VineCopula}} package. 
 #' @param treecrit Character indicating how pairs are selected in each tree.
-#' \code{treecrit = "tau"} uses the maxmium spanning tree of the Kendall's tau 
+#' \code{treecrit = "tau"} uses the maximum spanning tree of the Kendall's tau 
 #' (i.e., the tree of maximal overall dependence), \code{treecrit = "rho"} 
 #' uses the Spearman's rho.
 #' @param level Numerical; Passed to \code{\link{gamBiCopSelect}}, it is the
 #' significance level of the test for removing individual
 #' predictors (default: \code{level = 0.05}) for each conditional pair-copula. 
 #' @param trunclevel Integer; level of truncation.
-#' @param tau \code{TRUE} (default) for a calibration fonction specified for 
+#' @param tau \code{TRUE} (default) for a calibration function specified for 
 #' Kendall's tau or \code{FALSE} for a calibration function specified 
 #' for the Copula parameter.
 #' @param method \code{'NR'} for Newton-Raphson
@@ -64,6 +64,8 @@
 #' @param verbose \code{TRUE} if informations should be printed during the 
 #' estimation and \code{FALSE} (default) for a silent version.
 #' from \code{\link[mgcv:mgcv-package]{mgcv}}.
+#' @param select.once if \code{TRUE} the GAM structure is only selected once,
+#'   for the family that appears first in \code{familyset}.
 #' @return \code{gamVineSeqFit} returns a \code{\link{gamVine-class}} object.
 #' @examples
 #' require(VineCopula)
@@ -133,20 +135,21 @@ gamVineStructureSelect <- function(udata, lin.covs = NULL, smooth.covs = NULL,
                                    treecrit = "tau", level = 0.05, 
                                    trunclevel = NA, tau = TRUE, method = "FS",
                                    tol.rel = 0.001, n.iters = 10,
-                                   parallel = FALSE, verbose = FALSE) {
+                                   parallel = FALSE, verbose = FALSE,
+                                   select.once = TRUE) {
   
   tmp <- valid.gamVineStructureSelect(udata, lin.covs, smooth.covs, simplified, 
                                       type, familyset, rotations, familycrit,
                                       treecrit, level, trunclevel,
                                       tau, method, tol.rel, n.iters,
-                                      parallel, verbose)
+                                      parallel, verbose, select.once)
   if (tmp != TRUE) {
-   stop(tmp)
+    stop(tmp)
   }
   
   ## Transform to dataframe, get dimensions, etc (see in utilsPrivate)
   tmp <- prepare.data2(udata, lin.covs, smooth.covs, 
-                      trunclevel, familyset, rotations)
+                       trunclevel, familyset, rotations)
   n <- tmp$n
   d <- tmp$d
   l <- tmp$l
@@ -173,7 +176,7 @@ gamVineStructureSelect <- function(udata, lin.covs = NULL, smooth.covs = NULL,
                        tau, method, tol.rel, n.iters, parallel,  verbose)
   out$Tree[[1]] <- tree
   out$Graph[[1]] <- graph
-
+  
   oldtree  <- tree
   for(i in 2:(d-1)){
     if(trunclevel == i-1) {
@@ -189,7 +192,7 @@ gamVineStructureSelect <- function(udata, lin.covs = NULL, smooth.covs = NULL,
     out$Tree[[i]] <- tree
     out$Graph[[i]] <- graph
   }
-
+  
   return(as.GVC(out,covariates))
 }
 
@@ -343,7 +346,7 @@ fitTree <- function(mst, oldVineGraph, udata, l, lin.covs, smooth.covs,
     }
     
     if(verbose == TRUE) message(n1a," + ",n2a," --> ", E(mst)[i]$name)
-
+    
     E(mst)[i]$CondName2 <- n1a
     E(mst)[i]$CondName1 <- n2a
     
@@ -368,11 +371,11 @@ fitTree <- function(mst, oldVineGraph, udata, l, lin.covs, smooth.covs,
                                        lin.covs, temp)
     }
   }
-
+  
   outForACopula <- lapply(parameterForACopula, wrapper.fitACopula, 
                           familyset, familycrit, level,
                           tau, method, tol.rel, n.iters, parallel)
-
+  
   for (i in 1:d) {
     E(mst)[i]$model <- list(outForACopula[[i]]$model)
     E(mst)[i]$CondData2 <- list(outForACopula[[i]]$CondOn2)
@@ -571,7 +574,8 @@ fitACopula <- function(u1, u2, familyset=NA, familycrit="AIC",
 }
 
 fitAGAMCopula <- function(data, familyset, familycrit, level, tau, 
-                          method, tol.rel, n.iters, parallel, rotation = TRUE) {
+                          method, tol.rel, n.iters, parallel, rotation = TRUE,
+                          select.once = TRUE) {
   out <- list()
   u1 <- data[[1]][,1]
   u2 <- data[[1]][,2]
@@ -579,7 +583,7 @@ fitAGAMCopula <- function(data, familyset, familycrit, level, tau,
   lin.covs <- data[[2]]
   smooth.covs <- data[[3]]
   data <- do.call(cbind, data[!(sapply(data, is.null))])
-
+  
   if (length(familyset) == 1 && familyset == 0) {
     ## independence copula
     
@@ -593,8 +597,9 @@ fitAGAMCopula <- function(data, familyset, familycrit, level, tau,
     
     ## conditional copula
     tmp <- gamBiCopSelect(udata, lin.covs, smooth.covs,
-                       familyset, FALSE, familycrit, level, 1.5, tau,
-                       method, tol.rel, n.iters, parallel)
+                          familyset, FALSE, familycrit, level, 1.5, tau,
+                          method, tol.rel, n.iters, parallel, 
+                          select.once = select.once)
     if (!is.character(tmp)) {
       nvar <- unique(all.vars(tmp$res@model$pred.formula))
     }
@@ -718,17 +723,17 @@ valid.gamVineStructureSelect <- function(data, lin.covs, smooth.covs,
                                          familyset, rotations, familycrit, 
                                          treecrit, level, trunclevel, 
                                          tau, method, tol.rel, n.iters, 
-                                         parallel, verbose) {  
+                                         parallel, verbose, select.once) {  
   
   if (!is.matrix(data) && !is.data.frame(data)) {
     return("data has to be either a matrix or a data frame")
   } 
   tmp <- valid.gamBiCopSelect(data[,1:2], lin.covs, smooth.covs, rotations, 
-                           familyset, familycrit, level, 2, tau,
-                           method, tol.rel, n.iters, parallel, verbose)
+                              familyset, familycrit, level, 2, tau, method, 
+                              tol.rel, n.iters, parallel, verbose, select.once)
   if (tmp != TRUE)
     return(tmp)
- 
+  
   n <- dim(data)[1]
   d <- dim(data)[2]
   
@@ -745,9 +750,9 @@ valid.gamVineStructureSelect <- function(data, lin.covs, smooth.covs,
   if (!valid.logical(simplified)) {
     return(msg.logical(var2char(simplified)))
   }
-
+  
   if (is.null(lin.covs) && is.null(smooth.covs) && simplified == TRUE) {
-    return("When there are no covariates, the PCC can't be simplified.")
+    return("When there are no covariates, the vine can't be simplified.")
   }
   
   if (is.null(type) || length(type) != 1 || !is.element(type,c(0,1))) {
@@ -760,6 +765,10 @@ valid.gamVineStructureSelect <- function(data, lin.covs, smooth.covs,
   
   if (!is.na(trunclevel) && !valid.posint(trunclevel)) {
     return("'trunclevel' should be a positive integer or NA.")
+  }
+  
+  if (!is.logical(select.once)) {
+    return("'select.once' must be logical")
   }
   
   return(TRUE)

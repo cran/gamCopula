@@ -17,9 +17,9 @@
 #' linear) covariates (default: \code{lin.covs = NULL}).
 #' @param smooth.covs A matrix or data frame containing the non-parametric 
 #' (i.e., smooth) covariates (default: \code{smooth.covs = NULL}).
-#' @param simplified If \code{TRUE}, then a simplified PCC is fitted (which is
+#' @param simplified If \code{TRUE}, then a simplified vine is fitted (which is
 #' possible only if there are exogenous covariates). If \code{FALSE} (default),
-#' then a non-simplified PCC is fitted.
+#' then a non-simplified vine is fitted.
 #' @param familyset An integer vector of pair-copula families to select from 
 #' (the independence copula MUST NOT be specified in this vector unless one 
 #' wants to fit an independence vine!). The vector has to include at least one 
@@ -43,7 +43,7 @@
 #' significance level of the test for removing individual
 #' predictors (default: \code{level = 0.05}) for each conditional pair-copula.
 #' @param trunclevel Integer; level of truncation.
-#' @param tau \code{TRUE} (default) for a calibration fonction specified for 
+#' @param tau \code{TRUE} (default) for a calibration function specified for 
 #' Kendall's tau or \code{FALSE} for a calibration function specified 
 #' for the Copula parameter.
 #' @param method \code{'NR'} for Newton-Raphson
@@ -57,6 +57,8 @@
 #' @param verbose \code{TRUE} if informations should be printed during the 
 #' estimation and \code{FALSE} (default) for a silent version.
 #' from \code{\link[mgcv:mgcv-package]{mgcv}}.
+#' @param select.once if \code{TRUE} the GAM structure is only selected once,
+#'   for the family that appears first in \code{familyset}.
 #' @return \code{gamVineCopSelect} returns a \code{\link{gamVine-class}} object.
 #' @examples
 #' require(mgcv)
@@ -205,12 +207,13 @@ gamVineCopSelect <- function(data, Matrix,
                              familycrit = "AIC", level = 0.05,
                              trunclevel = NA, tau = TRUE, method = "FS",
                              tol.rel = 0.001, n.iters = 10, 
-                             parallel = FALSE, verbose = FALSE) {
+                             parallel = FALSE, verbose = FALSE,
+                             select.once = TRUE) {
   
   tmp <- valid.gamVineCopSelect(data, Matrix, lin.covs, smooth.covs, simplified,
                                 familyset, rotations, familycrit, level, 
                                 trunclevel, tau, method, tol.rel, n.iters, 
-                                parallel, verbose)
+                                parallel, verbose, select.once)
   if (tmp != TRUE) {
     stop(tmp)
   }   
@@ -284,8 +287,10 @@ gamVineCopSelect <- function(data, Matrix,
               names(tmp[[3]]) <- c(nn[oo[cond]], colnames(smooth.covs))
             }
           }  
+          
           tmp <- fitAGAMCopula(tmp, familyset, familycrit, level, 
-                               tau, method, tol.rel, n.iters, FALSE)
+                               tau, method, tol.rel, n.iters, FALSE, 
+                               rotations, select.once)
         }
       }
       model[[mki]] <- tmp$model
@@ -304,13 +309,13 @@ gamVineCopSelect <- function(data, Matrix,
 valid.gamVineCopSelect <- function(data, Matrix, lin.covs, smooth.covs, 
                                    simplified, familyset, rotations, familycrit, 
                                    level, trunclevel, tau, method, tol.rel, 
-                                   n.iters, parallel, verbose) {
+                                   n.iters, parallel, verbose, select.once) {
   
   tmp <- valid.gamVineStructureSelect(data, lin.covs, smooth.covs, simplified, 
                                       0, familyset, rotations, familycrit, 
                                       "tau", level, trunclevel, 
                                       tau, method, tol.rel, n.iters, 
-                                      parallel, verbose)
+                                      parallel, verbose, select.once)
   if (tmp != TRUE) {
     return(tmp)
   }  

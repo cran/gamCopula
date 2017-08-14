@@ -184,9 +184,9 @@ summary.gamVine <- function(object) {
   cat("\n", "Tree 1:", "\n")
   for (i in 1:(d - 1)) {
     mm <- GVC@model[[count]]
+    a <- paste(GVC@names[[GVC@Matrix[i, i]]], ",", 
+               GVC@names[[GVC@Matrix[d,i]]], sep = "")
     if ( valid.gamBiCop(mm) != TRUE) {
-      a <- paste(GVC@names[[GVC@Matrix[i, i]]], ",", 
-                 GVC@names[[GVC@Matrix[d,i]]], sep = "")
       a <- paste(a, ": ", bicopname(mm$family), sep = "")
       if (mm$family!=0) {
         a <- paste(a, " with par=", round(mm$par,2), sep="")
@@ -275,7 +275,7 @@ plot.gamVine <- function(x, ...) {
 setValidity("gamVine", valid.gamVine)
 setMethod("show", signature("gamVine"), show.gamVine)
 
-#' Summary for an Object of the Class gamVin
+#' Summary for an Object of the Class gamVine
 #' 
 #' Takes an object of the class 
 #' \code{\link[gamCopula:gamVine-class]{gamVine}} and produces various 
@@ -283,7 +283,7 @@ setMethod("show", signature("gamVine"), show.gamVine)
 #'
 #' @param object An object of the class
 #' \code{\link[gamCopula:gamVine-class]{gamVine}}.
-#' @param ... un-used in this class
+#' @param ... unused in this class
 #' @return A useful summary (see \code{\link{summary.gam}}
 #' from \code{\link[mgcv:mgcv-package]{mgcv}} for more details).
 #' @seealso \code{\link{summary.gam}}
