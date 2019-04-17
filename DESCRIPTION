@@ -2,8 +2,8 @@ Package: gamCopula
 Type: Package
 Title: Generalized Additive Models for Bivariate Conditional Dependence
         Structures and Vine Copulas
-Version: 0.0-4
-Date: 2017-08-17
+Version: 0.0-5
+Date: 2019-04-17
 Authors@R: c(
     person("Thomas", "Nagler",, "thomas.nagler@tum.de", role = "aut"),
     person("Thibault", "Vatter",, "thibault.vatter@gmail.com", role = c("aut", "cre"))
@@ -20,10 +20,10 @@ License: GPL-3
 LazyLoad: yes
 BugReports: https://github.com/tvatter/gamCopula/issues
 URL: https://github.com/tvatter/gamCopula
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 NeedsCompilation: no
-Packaged: 2017-08-17 20:40:48 UTC; tvatter
+Packaged: 2019-04-17 15:28:09 UTC; tvatter
 Author: Thomas Nagler [aut],
   Thibault Vatter [aut, cre]
 Repository: CRAN
-Date/Publication: 2017-08-17 23:19:44 UTC
+Date/Publication: 2019-04-17 15:50:02 UTC

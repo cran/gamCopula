@@ -33,10 +33,10 @@ gamVine <- function(Matrix, model, names = NA, covariates = NA) {
 } 
 
 valid.gamVine <- function(object) {
-  
+
   d <- length(attributes(object))
-  if ((d < 3) || names(attributes(object))[1:3] != 
-        c("Matrix", "model", "names")) {
+  if ((d < 3) || any(names(attributes(object))[1:3] != 
+        c("Matrix", "model", "names"))) {
     msg <- paste("A gamVine contains at least 1) a R-Vine matrix, 2) a list of",
                  "lists with three numeric items (family, par and par2) and/or", 
                  " gamBiCop objects and 3) a vector of names.", sep = "")
@@ -266,8 +266,11 @@ plot.gamVine <- function(x, ...) {
       }
       con2 <- paste0(sort(all.vars(mm@model$pred.formula)), collapse = ",")
       
-      plot(x@model[[j]], main = paste0(c(con1,con2), collapse = "|"), 
-           se = F, ...)
+      args <- list(x = x@model[[j]], 
+                   main = paste0(c(con1,con2), collapse = "|"), 
+                   se = F)
+      args <- modifyList(args, list(...))
+      do.call(plot, args)
     }
   }
 }
