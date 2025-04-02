@@ -1,7 +1,7 @@
 ## The current familyset of the gamCopula package
 get.familyset <- function() {
   # the Frank is available, but it works poorly.... still don't know why
-  c(1, 2, 301:304, 401:404)
+  c(1, 2, 5, 301:304, 401:404)
 }
 
 ## Fisher information with respect to the Copula parameter for a
@@ -60,6 +60,7 @@ get.familyset <- function() {
 }
 
 # Check parameter(s) for a given copula family
+#' @noRd
 family.check <- function(family, par, par2 = 0) {
   if (!(family %in% c(0, get.familyset()))) {
     return("Copula family not yet implemented.")
